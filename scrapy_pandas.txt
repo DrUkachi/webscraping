@@ -1,0 +1,28 @@
+class Spider(scrapy.Spider):
+
+    name = "wiki"
+    start_urls = ['https://datatables.net/']
+
+    def parse(self, response):
+
+        trs = response.xpath('//table[@id="example"]//tr')
+
+        if trs:
+            items = []
+            for tr in trs:
+                print tr.xpath('td[2]//text()').extract()
+                item = {
+                    "Name": tr.xpath('td[1]//text()').extract(),
+                    "Position": tr.xpath('td[2]//text()').extract(),
+                    "Office": tr.xpath('td[3]//text()').extract(),
+                    "Age": tr.xpath('td[4]//text()').extract(),
+                    "Start_Date": tr.xpath('td[5]//text()').extract(),
+                    "Salary": tr.xpath('td[6]//text()').extract()
+                }
+                items.append(item)
+
+
+            x = pd.DataFrame(items, columns=['Name','Position','Office','Age',
+                'Start_Date','Salary'])
+
+            yield x.to_csv("r",sep=",")
